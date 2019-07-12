@@ -594,15 +594,15 @@ private:
             ci_.reset(new sensor_msgs::CameraInfo(cinfo_->getCameraInfo()));
             ci_->header.stamp = wfov_image->image.header.stamp;
             ci_->header.frame_id = wfov_image->header.frame_id;
-	    // The width/height in sensor_msgs/CameraInfo is full camera resolution in pixels,
-	    // which is unchanged regardless of binning settings.
-	    ci_->width = ci_->width == 0 ? spinnaker_.getWidthMax() * binning_x_ : ci_->width;
-	    ci_->height = ci_->height == 0 ? spinnaker_.getHeightMax() * binning_y_ : ci_->height;
+            // The width/height in sensor_msgs/CameraInfo is full camera resolution in pixels,
+            // which is unchanged regardless of binning settings.
+            ci_->width = ci_->width == 0 ? spinnaker_.getWidthMax() * binning_x_ : ci_->width;
+            ci_->height = ci_->height == 0 ? spinnaker_.getHeightMax() * binning_y_ : ci_->height;
             // The height, width, distortion model, and parameters are all filled in by camera info manager.
             ci_->binning_x = binning_x_;
             ci_->binning_y = binning_y_;
-	    // NOTE: The ROI offset/size in Spinnaker driver is the values, given in binned image coordinates,
-	    //       in sensor_msgs/CameraInfo, on the other hand, given in un-binned image coordinates.
+            // NOTE: The ROI offset/size in Spinnaker driver is the values, given in binned image coordinates,
+            //       in sensor_msgs/CameraInfo, on the other hand, given in un-binned image coordinates.
             ci_->roi.x_offset = roi_x_offset_ * binning_x_;
             ci_->roi.y_offset = roi_y_offset_ * binning_y_;
             ci_->roi.height = roi_height_ * binning_y_;
