@@ -36,12 +36,16 @@ void Camera::init()
     throw std::runtime_error("[Camera::init] Unable to read HeightMax");
   }
   height_max_ = height_max_ptr->GetValue();
+  roi_height_ = height_max_;
+  roi_y_offset_ = 0;
   Spinnaker::GenApi::CIntegerPtr width_max_ptr = node_map_->GetNode("WidthMax");
   if (!IsAvailable(width_max_ptr) || !IsReadable(width_max_ptr))
   {
     throw std::runtime_error("[Camera::init] Unable to read WidthMax");
   }
   width_max_ = width_max_ptr->GetValue();
+  roi_width_ = width_max_;
+  roi_x_offset_ = 0;
   // Set Throughput to maximum
   //=====================================
   setMaxInt(node_map_, "DeviceLinkThroughputLimit");
@@ -202,25 +206,31 @@ void Camera::setImageControlFormats(const spinnaker_camera_driver::SpinnakerConf
 void Camera::setROI(const int x_offset, const int y_offset, const int roi_width, const int roi_height)
 {
   // Set Width/Height
-  if (roi_width <= 0 || roi_width > width_max_)
+  if (roi_width != roi_width_)
   {
-    setProperty(node_map_, "Width", width_max_);
-    roi_width_ = width_max_;
+    if (roi_width <= 0 || roi_width > width_max_)
+    {
+      setProperty(node_map_, "Width", width_max_);
+      roi_width_ = width_max_;
+    }
+    else
+    {
+      setProperty(node_map_, "Width", roi_width);
+      roi_width_ = roi_width;
+    }
   }
-  else
+  if (roi_height != roi_height_)
   {
-    setProperty(node_map_, "Width", roi_width);
-    roi_width_ = roi_width;
-  }
-  if (roi_height <= 0 || roi_height > height_max_)
-  {
-    setProperty(node_map_, "Height", height_max_);
-    roi_height_ = height_max_;
-  }
-  else
-  {
-    setProperty(node_map_, "Height", roi_height);
-    roi_height_ = roi_height;
+    if (roi_height <= 0 || roi_height > height_max_)
+    {
+      setProperty(node_map_, "Height", height_max_);
+      roi_height_ = height_max_;
+    }
+    else
+    {
+      setProperty(node_map_, "Height", roi_height);
+      roi_height_ = roi_height;
+    }
   }
 
   // Apply offset X

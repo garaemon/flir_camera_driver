@@ -531,10 +531,10 @@ private:
             {
               std::lock_guard<std::mutex> scopedLock(connect_mutex_);
               sub_ =
-                  getMTNodeHandle().subscribe("image_exposure_sequence", 10,
+                  getMTNodeHandle().subscribe("image_exposure_sequence", 1,
                                               &spinnaker_camera_driver::SpinnakerCameraNodelet::gainWBCallback, this);
               sub_roi_ =
-                  getMTNodeHandle().subscribe("set_roi", 10,
+                  getMTNodeHandle().subscribe("set_roi", 1,
                                               &spinnaker_camera_driver::SpinnakerCameraNodelet::roiCallback, this);
             }
 
