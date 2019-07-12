@@ -671,7 +671,8 @@ private:
   void roiCallback(const sensor_msgs::RegionOfInterest::ConstPtr &msg)
   {
     if ((msg->width + msg->height) > 0 &&
-        ((int)msg->width < spinnaker_.getWidthMax() || (int)msg->height < spinnaker_.getHeightMax()))
+        (static_cast<int>(msg->width) < spinnaker_.getWidthMax() ||
+         static_cast<int>(msg->height) < spinnaker_.getHeightMax()))
     {
       roi_x_offset_ = msg->x_offset;
       roi_y_offset_ = msg->y_offset;

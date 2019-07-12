@@ -104,8 +104,8 @@ void SpinnakerCamera::setROI(const int x_offset, const int y_offset, const int r
 
   if (camera_)
   {
-    bool need_restart = (captureRunning_ &&\
-                         (roi_width != camera_->getROIWidth() ||\
+    bool need_restart = (captureRunning_ && \
+                         (roi_width != camera_->getROIWidth() || \
                           roi_height != camera_->getROIHeight()));
     if (need_restart) stop();
     camera_->setROI(x_offset, y_offset, roi_width, roi_height);
