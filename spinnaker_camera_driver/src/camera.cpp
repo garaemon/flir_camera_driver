@@ -192,23 +192,43 @@ void Camera::setImageControlFormats(const spinnaker_camera_driver::SpinnakerConf
   // Apply offset Y
   setProperty(node_map_, "OffsetY", 0);
 
-  // Set Width/Height
-  if (config.image_format_roi_width <= 0 || config.image_format_roi_width > width_max_)
-    setProperty(node_map_, "Width", width_max_);
-  else
-    setProperty(node_map_, "Width", config.image_format_roi_width);
-  if (config.image_format_roi_height <= 0 || config.image_format_roi_height > height_max_)
-    setProperty(node_map_, "Height", height_max_);
-  else
-    setProperty(node_map_, "Height", config.image_format_roi_height);
-
-  // Apply offset X
-  setProperty(node_map_, "OffsetX", config.image_format_x_offset);
-  // Apply offset Y
-  setProperty(node_map_, "OffsetY", config.image_format_y_offset);
+  setROI(config.image_format_x_offset, config.image_format_y_offset,
+         config.image_format_roi_width, config.image_format_roi_height);
 
   // Set Pixel Format
   setProperty(node_map_, "PixelFormat", config.image_format_color_coding);
+}
+
+void Camera::setROI(const int x_offset, const int y_offset, const int roi_width, const int roi_height)
+{
+  // Set Width/Height
+  if (roi_width <= 0 || roi_width > width_max_)
+  {
+    setProperty(node_map_, "Width", width_max_);
+    roi_width_ = width_max_;
+  }
+  else
+  {
+    setProperty(node_map_, "Width", roi_width);
+    roi_width_ = roi_width;
+  }
+  if (roi_height <= 0 || roi_height > height_max_)
+  {
+    setProperty(node_map_, "Height", height_max_);
+    roi_height_ = height_max_;
+  }
+  else
+  {
+    setProperty(node_map_, "Height", roi_height);
+    roi_height_ = roi_height;
+  }
+
+  // Apply offset X
+  setProperty(node_map_, "OffsetX", x_offset);
+  roi_x_offset_ = x_offset;
+  // Apply offset Y
+  setProperty(node_map_, "OffsetY", y_offset);
+  roi_y_offset_ = y_offset;
 }
 
 void Camera::setGain(const float& gain)
@@ -237,14 +257,34 @@ void Camera::setupGigEPacketDelay(PGRGuid & guid, unsigned int packet_delay)
 
 */
 
-int Camera::getHeightMax()
+int Camera::getHeightMax() const
 {
   return height_max_;
 }
 
-int Camera::getWidthMax()
+int Camera::getWidthMax() const
 {
   return width_max_;
+}
+
+int Camera::getROIXOffset() const
+{
+  return roi_x_offset_;
+}
+
+int Camera::getROIYOffset() const
+{
+  return roi_y_offset_;
+}
+
+int Camera::getROIWidth() const
+{
+  return roi_width_;
+}
+
+int Camera::getROIHeight() const
+{
+  return roi_height_;
 }
 
 // uint SpinnakerCamera::getGain()

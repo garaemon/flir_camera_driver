@@ -62,9 +62,15 @@ public:
   /** Parameters that can be changed while a sensor is streaming. */
   static const uint8_t LEVEL_RECONFIGURE_RUNNING = 0;
 
+  virtual void setROI(const int x_offset, const int y_offset, const int roi_width, const int roi_height);
   virtual void setGain(const float& gain);
-  int getHeightMax();
-  int getWidthMax();
+  int getHeightMax() const;
+  int getWidthMax() const;
+
+  int getROIXOffset() const;
+  int getROIYOffset() const;
+  int getROIWidth() const;
+  int getROIHeight() const;
 
   Spinnaker::GenApi::CNodePtr
   readProperty(const Spinnaker::GenICam::gcstring property_name);
@@ -76,6 +82,8 @@ protected:
 
   int height_max_;
   int width_max_;
+
+  int roi_x_offset_, roi_y_offset_, roi_width_, roi_height_;
 
   /*!
   * \brief Changes the video mode of the connected camera.

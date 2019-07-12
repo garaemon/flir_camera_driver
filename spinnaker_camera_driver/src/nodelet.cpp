@@ -456,6 +456,7 @@ private:
           {
             std::lock_guard<std::mutex> scopedLock(connect_mutex_);
             sub_.shutdown();
+            sub_roi_.shutdown();
           }
 
           try
@@ -532,6 +533,9 @@ private:
               sub_ =
                   getMTNodeHandle().subscribe("image_exposure_sequence", 10,
                                               &spinnaker_camera_driver::SpinnakerCameraNodelet::gainWBCallback, this);
+              sub_roi_ =
+                  getMTNodeHandle().subscribe("set_roi", 10,
+                                              &spinnaker_camera_driver::SpinnakerCameraNodelet::roiCallback, this);
             }
 
             state = CONNECTED;
@@ -664,6 +668,29 @@ private:
     }
   }
 
+  void roiCallback(const sensor_msgs::RegionOfInterest::ConstPtr &msg)
+  {
+    if ((msg->width + msg->height) > 0 &&
+        ((int)msg->width < spinnaker_.getWidthMax() || (int)msg->height < spinnaker_.getHeightMax()))
+    {
+      roi_x_offset_ = msg->x_offset;
+      roi_y_offset_ = msg->y_offset;
+      roi_width_ = msg->width;
+      roi_height_ = msg->height;
+      do_rectify_ = true;
+    }
+    else
+    {
+      // Zeros mean the full resolution was captured.
+      roi_x_offset_ = 0;
+      roi_y_offset_ = 0;
+      roi_height_ = 0;
+      roi_width_ = 0;
+      do_rectify_ = false;  // Set to false if the whole image is captured.
+    }
+    spinnaker_.setROI(roi_x_offset_, roi_y_offset_, roi_width_, roi_height_);
+  }
+
   /* Class Fields */
   std::shared_ptr<dynamic_reconfigure::Server<spinnaker_camera_driver::SpinnakerConfig> > srv_;  ///< Needed to
                                                                                                  ///  initialize
@@ -682,6 +709,7 @@ private:
   /// constructor
   /// requirements
   ros::Subscriber sub_;  ///< Subscriber for gain and white balance changes.
+  ros::Subscriber sub_roi_;   ///< Subscriber for setting ROI
 
   std::mutex connect_mutex_;
 

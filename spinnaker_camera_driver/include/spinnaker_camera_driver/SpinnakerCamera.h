@@ -86,6 +86,8 @@ public:
   */
   void setNewConfiguration(const spinnaker_camera_driver::SpinnakerConfig& config, const uint32_t& level);
 
+  void setROI(const int x_offset, const int y_offset, const int roi_width, const int roi_height);
+
   /** Parameters that need a sensor to be stopped completely when changed. */
   static const uint8_t LEVEL_RECONFIGURE_CLOSE = 3;
 

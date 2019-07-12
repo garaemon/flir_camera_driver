@@ -97,6 +97,22 @@ void SpinnakerCamera::setNewConfiguration(const spinnaker_camera_driver::Spinnak
   }
 }  // end setNewConfiguration
 
+void SpinnakerCamera::setROI(const int x_offset, const int y_offset, const int roi_width, const int roi_height)
+{
+  // Activate mutex to prevent us from grabbing images during this time
+  std::lock_guard<std::mutex> scopedLock(mutex_);
+
+  if (camera_)
+  {
+    bool need_restart = (captureRunning_ &&\
+                         (roi_width != camera_->getROIWidth() ||\
+                          roi_height != camera_->getROIHeight()));
+    if (need_restart) stop();
+    camera_->setROI(x_offset, y_offset, roi_width, roi_height);
+    if (need_restart) start();
+  }
+}
+
 void SpinnakerCamera::setGain(const float& gain)
 {
   if (camera_)
