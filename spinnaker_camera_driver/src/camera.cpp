@@ -160,6 +160,9 @@ void Camera::setNewConfiguration(const SpinnakerConfig& config, const uint32_t& 
         setProperty(node_map_, "BalanceRatio", static_cast<float>(config.white_balance_red_ratio));
       }
     }
+
+    setProperty(node_map_, "ReverseX", config.reverse_x);
+    setProperty(node_map_, "ReverseY", config.reverse_y);
   }
   catch (const Spinnaker::Exception& e)
   {
