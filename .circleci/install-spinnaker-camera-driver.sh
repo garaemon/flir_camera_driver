@@ -4,13 +4,16 @@ install-spinnaker-camera-driver() {
   set -e
   local LSB_RELEASE=$(lsb_release -cs)
   local ARCH=$(dpkg --print-architecture)
-  local SPINNAKER_VERSION="1.13.0.31"
+  local SPINNAKER_VERSION="1.21.0.61"
   local SPINNAKER_HEADER_DIR=/usr/include/spinnaker
   local SPINNAKER_ARCHIVE_DIR="/tmp/spinnaker-${SPINNAKER_VERSION}-${ARCH}.tar.gz"
   local SPINNAKER_INSTALLER_DIR="/tmp/spinnaker-${SPINNAKER_VERSION}-${ARCH}"
   local SPINNAKER_RULE_FILE=/etc/udev/rules.d/40-flir-spinnaker.rules
-  local SPINNAKER_DOWNLOAD_URL_VAR="SPINNAKER_DOWNLOAD_URL_${SPINNAKER_VERSION//./_}_${LSB_RELEASE}_${ARCH}"
-  local SPINNAKER_DOWNLOAD_URL="${!SPINNAKER_DOWNLOAD_URL_VAR}"
+  if [ "$LSB_RELEASE" = "xenial" ]; then
+    local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1Mdp3izWGmI0qE7L1j3SeSUsRjdZAni16'
+  elif [ "$LSB_RELEASE" = "bionic" ]; then
+    local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1TfxcYkHy20deJ7iCLB9Xojn-WARcxUHE'
+  fi
 
   if [ -e $SPINNAKER_HEADER_DIR/Spinnaker.h ]; then
     echo "Spinnaker camera driver is already installed"
