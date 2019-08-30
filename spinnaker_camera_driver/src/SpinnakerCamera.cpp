@@ -53,6 +53,8 @@ namespace spinnaker_camera_driver
 {
 SpinnakerCamera::SpinnakerCamera()
   : serial_(0)
+  , seq_(0)
+  , use_device_seq_(false)
   , system_(Spinnaker::System::GetInstance())
   , camList_(system_->GetCameras())
   , pCam_(static_cast<int>(NULL))  // Hack to suppress compiler warning. Spinnaker has only one contructor which takes
@@ -80,6 +82,8 @@ void SpinnakerCamera::setNewConfiguration(const spinnaker_camera_driver::Spinnak
 
   // Activate mutex to prevent us from grabbing images during this time
   std::lock_guard<std::mutex> scopedLock(mutex_);
+
+  use_device_seq_ = config.use_device_seq;
 
   if (level >= LEVEL_RECONFIGURE_STOP)
   {
@@ -357,6 +361,8 @@ void SpinnakerCamera::grabImage(sensor_msgs::Image* image, const std::string& fr
       else
       {
         // Set Image Time Stamp
+        if (use_device_seq_) image->header.seq = static_cast<uint32_t>(image_ptr->GetID());
+        else                 image->header.seq = seq_++;
         image->header.stamp.sec = image_ptr->GetTimeStamp() * 1e-9;
         image->header.stamp.nsec = image_ptr->GetTimeStamp();
 
