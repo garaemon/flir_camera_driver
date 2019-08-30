@@ -1,0 +1,1 @@
+- git: {local-name: pointgrey_camera_driver, uri: 'https://github.com/ros-drivers/pointgrey_camera_driver.git', version: master}

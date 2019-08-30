@@ -129,6 +129,7 @@ jobs:
           name: Install spinnaker camera driver
           command: |
             ./.circleci/install-spinnaker-camera-driver.sh
+            ./.circleci/install-flycapture2.sh
       - run:
           name: rosdep install
           command: |
@@ -161,7 +162,7 @@ jobs:
 
     working_directory: ~/src/project
     environment:
-      ROSINSTALL_FILE: .travis.rosinstall
+      ROSINSTALL_FILE: .travis.melodic.rosinstall
       CC: ccache gcc
       CXX: ccache g++
 
