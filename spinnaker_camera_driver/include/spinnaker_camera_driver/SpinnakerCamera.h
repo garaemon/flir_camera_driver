@@ -192,6 +192,9 @@ private:
   /// If true, camera is currently running in color mode, otherwise camera is running in mono mode
   bool isColor_;
 
+  // buffer handling mode
+  std::string buffer_handling_mode_;
+
   // For GigE cameras:
   /// If true, GigE packet size is automatically determined, otherwise packet_size_ is used:
   bool auto_packet_size_;
