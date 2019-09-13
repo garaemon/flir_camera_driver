@@ -129,6 +129,7 @@ private:
       NODELET_DEBUG_ONCE("Dynamic reconfigure callback with level: %u", level);
       spinnaker_.setNewConfiguration(config, level);
 
+      publish_diagnostics_ = config.publish_diagnostics;
       diag_pub_rate_ = config.diagnostic_publish_rate;
 
       // Store needed parameters for the metadata message
@@ -172,7 +173,7 @@ private:
 
   void diagCb()
   {
-    if (!diagThread_)  // We need to connect
+    if (publish_diagnostics_ && !diagThread_)  // We need to connect
     {
       // Start the thread to loop through and publish messages
       diagThread_.reset(
@@ -728,6 +729,7 @@ private:
   std::shared_ptr<boost::thread> pubThread_;  ///< The thread that reads and publishes the images.
   std::shared_ptr<boost::thread> diagThread_;  ///< The thread that reads and publishes the diagnostics.
 
+  bool publish_diagnostics_;
   double diag_pub_rate_;
   std::unique_ptr<DiagnosticsManager> diag_man;
 
