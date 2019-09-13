@@ -129,6 +129,8 @@ private:
       NODELET_DEBUG_ONCE("Dynamic reconfigure callback with level: %u", level);
       spinnaker_.setNewConfiguration(config, level);
 
+      diag_pub_rate_ = config.diagnostic_publish_rate;
+
       // Store needed parameters for the metadata message
       gain_ = config.gain;
       wb_blue_ = config.white_balance_blue_ratio;
@@ -409,11 +411,13 @@ private:
 
   void diagPoll()
   {
+    ros::Rate r(diag_pub_rate_);
     while (!boost::this_thread::interruption_requested())  // Block until we need
                                                            // to stop this
                                                            // thread.
     {
       diag_man->processDiagnostics(&spinnaker_);
+      r.sleep();
     }
   }
 
@@ -724,6 +728,7 @@ private:
   std::shared_ptr<boost::thread> pubThread_;  ///< The thread that reads and publishes the images.
   std::shared_ptr<boost::thread> diagThread_;  ///< The thread that reads and publishes the diagnostics.
 
+  double diag_pub_rate_;
   std::unique_ptr<DiagnosticsManager> diag_man;
 
   double gain_;
