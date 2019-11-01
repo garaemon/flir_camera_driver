@@ -25,6 +25,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include "spinnaker_camera_driver/camera.h"
 
 #include <string>
+#include <vector>
 #include <yaml-cpp/yaml.h>
 
 namespace spinnaker_camera_driver
