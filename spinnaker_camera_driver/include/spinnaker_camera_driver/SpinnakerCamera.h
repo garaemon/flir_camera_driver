@@ -84,7 +84,7 @@ public:
   *
   * \return Returns true when the configuration could be applied without modification.
   */
-  void setNewConfiguration(const spinnaker_camera_driver::SpinnakerConfig& config, const uint32_t& level);
+  void setNewConfiguration(spinnaker_camera_driver::SpinnakerConfig& config, const uint32_t& level);
 
   void setROI(const int x_offset, const int y_offset, const int roi_width, const int roi_height);
 

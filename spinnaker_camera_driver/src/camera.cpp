@@ -25,6 +25,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include "spinnaker_camera_driver/camera.h"
 
 #include <string>
+#include <vector>
+#include <yaml-cpp/yaml.h>
 
 namespace spinnaker_camera_driver
 {
@@ -69,7 +71,7 @@ void Camera::setFrameRate(const float frame_rate)
   ROS_DEBUG_STREAM("Current Frame rate: \t " << ptrAcquisitionFrameRate->GetValue());
 }
 
-void Camera::setNewConfiguration(const SpinnakerConfig& config, const uint32_t& level)
+void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
 {
   try
   {
@@ -154,10 +156,120 @@ void Camera::setNewConfiguration(const SpinnakerConfig& config, const uint32_t& 
       setProperty(node_map_, "BalanceWhiteAuto", config.auto_white_balance);
       if (config.auto_white_balance.compare(std::string("Off")) == 0)
       {
-        setProperty(node_map_, "BalanceRatioSelector", "Blue");
+        setProperty(node_map_, "BalanceRatioSelector", std::string("Blue"));
         setProperty(node_map_, "BalanceRatio", static_cast<float>(config.white_balance_blue_ratio));
-        setProperty(node_map_, "BalanceRatioSelector", "Red");
+        setProperty(node_map_, "BalanceRatioSelector", std::string("Red"));
         setProperty(node_map_, "BalanceRatio", static_cast<float>(config.white_balance_red_ratio));
+      }
+    }
+
+    // Color correction matrix
+    if (IsAvailable(node_map_->GetNode("IspEnable")))
+    {
+      setProperty(node_map_, "IspEnable", true);
+      if (IsAvailable(node_map_->GetNode("ColorTransformationSelector")) &&
+          IsAvailable(node_map_->GetNode("ColorTransformationEnable")) &&
+          IsAvailable(node_map_->GetNode("RgbTransformLightSource")))
+      {
+        if (config.color_correction_enable)
+        {
+          setProperty(node_map_, "ColorTransformationSelector", std::string("RGBtoRGB"));
+          setProperty(node_map_, "ColorTransformationEnable", true);
+          setProperty(node_map_, "RgbTransformLightSource", config.color_correction_light_source);
+          std::vector<std::vector<float>> ccm = {
+            { 1.0f, 0.0f, 0.0f, },
+            { 0.0f, 1.0f, 0.0f, },
+            { 0.0f, 0.0f, 1.0f, },
+            { 0.0f, 0.0f, 0.0f, },
+          };
+          if (config.color_correction_light_source == "Custom")
+          {
+            try
+            {
+              ccm = YAML::Load(config.color_correction_matrix).as<std::vector<std::vector<float>>>();
+              if (ccm.size() != 4) throw std::runtime_error("invalid");
+              for (const auto &v : ccm)
+                if (v.size() != 3) throw std::runtime_error("invalid");
+            }
+            catch (...)
+            {
+              ccm = {
+                { 1.0f, 0.0f, 0.0f, },
+                { 0.0f, 1.0f, 0.0f, },
+                { 0.0f, 0.0f, 1.0f, },
+                { 0.0f, 0.0f, 0.0f, },
+              };
+            }
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain00"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[0][0]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain01"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[0][1]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain02"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[0][2]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain10"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[1][0]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain11"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[1][1]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain12"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[1][2]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain20"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[2][0]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain21"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[2][1]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain22"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[2][2]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Offset0"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[3][0]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Offset1"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[3][1]);
+            setProperty(node_map_, "ColorTransformationValueSelector", std::string("Offset2"));
+            setProperty(node_map_, "ColorTransformationValue", ccm[3][2]);
+          }
+
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain00"));
+          ccm[0][0] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain01"));
+          ccm[0][1] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain02"));
+          ccm[0][2] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain10"));
+          ccm[1][0] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain11"));
+          ccm[1][1] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain12"));
+          ccm[1][2] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain20"));
+          ccm[2][0] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain21"));
+          ccm[2][1] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Gain22"));
+          ccm[2][2] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Offset0"));
+          ccm[3][0] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Offset1"));
+          ccm[3][1] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          setProperty(node_map_, "ColorTransformationValueSelector", std::string("Offset2"));
+          ccm[3][2] = static_cast<Spinnaker::GenApi::CFloatPtr>(node_map_->GetNode("ColorTransformationValue"))->GetValue();
+          std::ostringstream oss;
+          oss << "[";
+          for (size_t i = 0; i < ccm.size(); ++i)
+          {
+            oss << "[";
+            for (size_t j = 0; j < ccm[i].size(); ++j)
+            {
+              oss << ccm[i][j];
+              if (j < ccm[i].size() - 1) oss << ",";
+            }
+            oss << "]";
+            if (i < ccm.size() - 1) oss << ",";
+          }
+          oss << "]";
+          config.color_correction_matrix = oss.str();
+        }
+        else
+        {
+          setProperty(node_map_, "ColorTransformationEnable", false);
+        }
       }
     }
 
