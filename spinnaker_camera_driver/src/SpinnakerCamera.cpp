@@ -72,7 +72,7 @@ SpinnakerCamera::~SpinnakerCamera()
   system_->ReleaseInstance();
 }
 
-void SpinnakerCamera::setNewConfiguration(const spinnaker_camera_driver::SpinnakerConfig& config, const uint32_t& level)
+void SpinnakerCamera::setNewConfiguration(spinnaker_camera_driver::SpinnakerConfig& config, const uint32_t& level)
 {
   // Check if camera is connected
   if (!pCam_)

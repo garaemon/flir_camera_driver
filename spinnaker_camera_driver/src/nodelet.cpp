@@ -120,7 +120,7 @@ private:
   * \param level driver_base reconfiguration level.  See driver_base/SensorLevels.h for more information.
   */
 
-  void paramCallback(const spinnaker_camera_driver::SpinnakerConfig& config, uint32_t level)
+  void paramCallback(spinnaker_camera_driver::SpinnakerConfig& config, uint32_t level)
   {
     config_ = config;
 
