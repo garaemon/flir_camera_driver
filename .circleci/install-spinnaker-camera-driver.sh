@@ -4,15 +4,26 @@ install-spinnaker-camera-driver() {
   set -e
   local LSB_RELEASE=$(lsb_release -cs)
   local ARCH=$(dpkg --print-architecture)
-  local SPINNAKER_VERSION="1.21.0.61"
+  local SPINNAKER_VERSION="1.26.0.31"
   local SPINNAKER_HEADER_DIR=/usr/include/spinnaker
   local SPINNAKER_ARCHIVE_DIR="/tmp/spinnaker-${SPINNAKER_VERSION}-${ARCH}.tar.gz"
   local SPINNAKER_INSTALLER_DIR="/tmp/spinnaker-${SPINNAKER_VERSION}-${ARCH}"
   local SPINNAKER_RULE_FILE=/etc/udev/rules.d/40-flir-spinnaker.rules
-  if [ "$LSB_RELEASE" = "xenial" ]; then
-    local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1Mdp3izWGmI0qE7L1j3SeSUsRjdZAni16'
-  elif [ "$LSB_RELEASE" = "bionic" ]; then
-    local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1TfxcYkHy20deJ7iCLB9Xojn-WARcxUHE'
+  if [ "$SPINNAKER_VERSION" = "1.21.0.61" ]; then
+    if [ "$LSB_RELEASE" = "xenial" ]; then
+      local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1Mdp3izWGmI0qE7L1j3SeSUsRjdZAni16'
+    elif [ "$LSB_RELEASE" = "bionic" ]; then
+      local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1TfxcYkHy20deJ7iCLB9Xojn-WARcxUHE'
+    fi
+  elif [ "$SPINNAKER_VERSION" = "1.26.0.31" ]; then
+    if [ "$LSB_RELEASE" = "xenial" ]; then
+      local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1FLCjz_7JMe1qwmH6GkOk1YpLP-mLzXUg'
+    elif [ "$LSB_RELEASE" = "bionic" ]; then
+      local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1TnhTYvI1JWx_ulehYbb_NVua-Q1uA1me'
+    fi
+  else
+    echo "INVALID SPINNAKER VERSION: ${SPINNAKER_VERSION}"
+    return 1
   fi
 
   if [ -e $SPINNAKER_HEADER_DIR/Spinnaker.h ]; then

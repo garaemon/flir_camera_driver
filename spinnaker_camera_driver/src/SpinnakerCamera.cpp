@@ -74,6 +74,7 @@ SpinnakerCamera::~SpinnakerCamera()
 
 void SpinnakerCamera::setNewConfiguration(spinnaker_camera_driver::SpinnakerConfig& config, const uint32_t& level)
 {
+  buffer_handling_mode_ = config.buffer_handling_mode;
   // Check if camera is connected
   if (!pCam_)
   {
@@ -238,6 +239,28 @@ void SpinnakerCamera::connect()
     {
       // Initialize Camera
       pCam_->Init();
+
+      // Manipulate buffer handling method
+      Spinnaker::GenApi::INodeMap &stream_node_map = pCam_->GetTLStreamNodeMap();
+      Spinnaker::GenApi::CEnumerationPtr ptrHandlingMode = stream_node_map.GetNode("StreamBufferHandlingMode");
+      if (Spinnaker::GenApi::IsAvailable(ptrHandlingMode) &&
+          Spinnaker::GenApi::IsWritable(ptrHandlingMode))
+      {
+        Spinnaker::GenApi::CEnumEntryPtr ptrHandlingModeEntry = ptrHandlingMode->GetEntryByName(
+            Spinnaker::GenICam::gcstring(buffer_handling_mode_.c_str()));
+        ptrHandlingMode->SetIntValue(ptrHandlingModeEntry->GetValue());
+        ptrHandlingModeEntry = ptrHandlingMode->GetCurrentEntry();
+        if (Spinnaker::GenApi::IsAvailable(ptrHandlingModeEntry) &&
+            Spinnaker::GenApi::IsReadable(ptrHandlingModeEntry))
+        {
+          ROS_INFO_STREAM("[SpinnakerCamera::connect]: Buffer Handling Mode: "
+                          << ptrHandlingModeEntry->GetDisplayName());
+        }
+      }
+      else
+      {
+        ROS_WARN("[SpinnakerCamera::connect]: Cannot access to StreamBufferHandlingMode");
+      }
 
       // Retrieve GenICam nodemap
       node_map_ = &pCam_->GetNodeMap();
