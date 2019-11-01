@@ -25,6 +25,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include "spinnaker_camera_driver/camera.h"
 
 #include <string>
+#include <yaml-cpp/yaml.h>
 
 namespace spinnaker_camera_driver
 {
@@ -158,6 +159,71 @@ void Camera::setNewConfiguration(const SpinnakerConfig& config, const uint32_t& 
         setProperty(node_map_, "BalanceRatio", static_cast<float>(config.white_balance_blue_ratio));
         setProperty(node_map_, "BalanceRatioSelector", "Red");
         setProperty(node_map_, "BalanceRatio", static_cast<float>(config.white_balance_red_ratio));
+      }
+    }
+
+    // Color correction matrix
+    if (IsAvailable(node_map_->GetNode("IspEnable")))
+    {
+      setProperty(node_map_, "IspEnable", true);
+      if (IsAvailable(node_map_->GetNode("ColorTransformationSelector")) &&
+          IsAvailable(node_map_->GetNode("ColorTransformationEnable")) &&
+          IsAvailable(node_map_->GetNode("RgbTransformLightSource")))
+      {
+        if (config.color_correction_enable)
+        {
+          setProperty(node_map_, "ColorTransformationSelector", "RGBtoRGB");
+          setProperty(node_map_, "ColorTransformationEnable", true);
+          setProperty(node_map_, "RgbTransformLightSource", config.color_correction_light_source);
+          if (config.color_correction_light_source == "Custom")
+          {
+            std::vector<std::vector<float>> ccm;
+            try
+            {
+              ccm = YAML::Load(config.color_correction_matrix).as<std::vector<std::vector<float>>>();
+              if (ccm.size() != 4) throw std::runtime_error("invalid");
+              for (const auto &v : ccm)
+                if (v.size() != 3) throw std::runtime_error("invalid");
+            }
+            catch (...)
+            {
+              ccm = {
+                { 1.0f, 0.0f, 0.0f, },
+                { 0.0f, 1.0f, 0.0f, },
+                { 0.0f, 0.0f, 1.0f, },
+                { 0.0f, 0.0f, 0.0f, },
+              };
+            }
+            setProperty(node_map_, "ColorTransformationValueSelector", "Gain00");
+            setProperty(node_map_, "ColorTransformationValue", ccm[0][0]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Gain01");
+            setProperty(node_map_, "ColorTransformationValue", ccm[0][1]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Gain02");
+            setProperty(node_map_, "ColorTransformationValue", ccm[0][2]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Gain10");
+            setProperty(node_map_, "ColorTransformationValue", ccm[1][0]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Gain11");
+            setProperty(node_map_, "ColorTransformationValue", ccm[1][1]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Gain12");
+            setProperty(node_map_, "ColorTransformationValue", ccm[1][2]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Gain20");
+            setProperty(node_map_, "ColorTransformationValue", ccm[2][0]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Gain21");
+            setProperty(node_map_, "ColorTransformationValue", ccm[2][1]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Gain22");
+            setProperty(node_map_, "ColorTransformationValue", ccm[2][2]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Offset0");
+            setProperty(node_map_, "ColorTransformationValue", ccm[3][0]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Offset1");
+            setProperty(node_map_, "ColorTransformationValue", ccm[3][1]);
+            setProperty(node_map_, "ColorTransformationValueSelector", "Offset2");
+            setProperty(node_map_, "ColorTransformationValue", ccm[3][2]);
+          }
+        }
+        else
+        {
+          setProperty(node_map_, "ColorTransformationEnable", false);
+        }
       }
     }
 
