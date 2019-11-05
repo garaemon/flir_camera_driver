@@ -166,13 +166,13 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
     // Color correction matrix
     if (IsAvailable(node_map_->GetNode("IspEnable")))
     {
-      setProperty(node_map_, "IspEnable", true);
       if (IsAvailable(node_map_->GetNode("ColorTransformationSelector")) &&
           IsAvailable(node_map_->GetNode("ColorTransformationEnable")) &&
           IsAvailable(node_map_->GetNode("RgbTransformLightSource")))
       {
         if (config.color_correction_enable)
         {
+          setProperty(node_map_, "IspEnable", true);
           setProperty(node_map_, "ColorTransformationSelector", std::string("RGBtoRGB"));
           setProperty(node_map_, "ColorTransformationEnable", true);
           setProperty(node_map_, "RgbTransformLightSource", config.color_correction_light_source);
@@ -269,6 +269,7 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
         else
         {
           setProperty(node_map_, "ColorTransformationEnable", false);
+          setProperty(node_map_, "IspEnable", false);
         }
       }
     }
