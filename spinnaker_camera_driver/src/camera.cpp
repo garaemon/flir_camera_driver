@@ -94,6 +94,7 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
     setProperty(node_map_, "LineSelector", config.line_selector);
     setProperty(node_map_, "LineMode", config.line_mode);
     setProperty(node_map_, "LineSource", config.line_source);
+    setProperty(node_map_, "V3_3Enable", config.v3_3_enable);
 
     // Set auto exposure
     setProperty(node_map_, "ExposureMode", config.exposure_mode);
