@@ -47,7 +47,6 @@ jobs:
           name: Install spinnaker camera driver
           command: |
             ./.circleci/install-spinnaker-camera-driver.sh
-            ./.circleci/install-flycapture2.sh
       - run:
           name: rosdep install
           command: |
