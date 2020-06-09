@@ -456,7 +456,7 @@ private:
         case ERROR:
 // Generally there's no need to stop before disconnecting after an
 // error. Indeed, stop will usually fail.
-#if STOP_ON_ERROR
+// #if STOP_ON_ERROR
           // Try stopping the camera
           {
             std::lock_guard<std::mutex> scopedLock(connect_mutex_);
@@ -483,7 +483,7 @@ private:
           }
 
           break;
-#endif
+// #endif
         case STOPPED:
           // Try disconnecting from the camera
           try
