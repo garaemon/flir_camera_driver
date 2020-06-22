@@ -109,6 +109,8 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
         setProperty(node_map_, "SharpeningAuto", config.auto_sharpness);
         setProperty(node_map_, "Sharpening", static_cast<float>(config.sharpness));
         setProperty(node_map_, "SharpeningThreshold", static_cast<float>(config.sharpening_threshold));
+        Spinnaker::GenApi::CFloatPtr ptrSharpening = node_map_->GetNode("Sharpening");
+        config.sharpness = ptrSharpening->GetValue();
       }
     }
 
@@ -142,6 +144,8 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
     {
       setProperty(node_map_, "Gain", static_cast<float>(config.gain));
     }
+    Spinnaker::GenApi::CFloatPtr ptrGain = node_map_->GetNode("Gain");
+    config.gain = ptrGain->GetValue();
 
     // Set brightness
     setProperty(node_map_, "BlackLevel", static_cast<float>(config.brightness));
@@ -161,8 +165,21 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
       {
         setProperty(node_map_, "BalanceRatioSelector", std::string("Blue"));
         setProperty(node_map_, "BalanceRatio", static_cast<float>(config.white_balance_blue_ratio));
+        Spinnaker::GenApi::CFloatPtr ptrBalanceRatioBlue = node_map_->GetNode("BalanceRatio");
+        config.white_balance_blue_ratio = ptrBalanceRatioBlue->GetValue();
         setProperty(node_map_, "BalanceRatioSelector", std::string("Red"));
         setProperty(node_map_, "BalanceRatio", static_cast<float>(config.white_balance_red_ratio));
+        Spinnaker::GenApi::CFloatPtr ptrBalanceRatioRed = node_map_->GetNode("BalanceRatio");
+        config.white_balance_blue_ratio = ptrBalanceRatioRed->GetValue();
+      }
+      else
+      {
+        setProperty(node_map_, "BalanceRatioSelector", std::string("Blue"));
+        Spinnaker::GenApi::CFloatPtr ptrBalanceRatioBlue = node_map_->GetNode("BalanceRatio");
+        config.white_balance_blue_ratio = ptrBalanceRatioBlue->GetValue();
+        setProperty(node_map_, "BalanceRatioSelector", std::string("Red"));
+        Spinnaker::GenApi::CFloatPtr ptrBalanceRatioRed = node_map_->GetNode("BalanceRatio");
+        config.white_balance_blue_ratio = ptrBalanceRatioRed->GetValue();
       }
     }
 
