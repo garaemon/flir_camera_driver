@@ -170,7 +170,7 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
         setProperty(node_map_, "BalanceRatioSelector", std::string("Red"));
         setProperty(node_map_, "BalanceRatio", static_cast<float>(config.white_balance_red_ratio));
         Spinnaker::GenApi::CFloatPtr ptrBalanceRatioRed = node_map_->GetNode("BalanceRatio");
-        config.white_balance_blue_ratio = ptrBalanceRatioRed->GetValue();
+        config.white_balance_red_ratio = ptrBalanceRatioRed->GetValue();
       }
       else
       {
@@ -179,7 +179,7 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
         config.white_balance_blue_ratio = ptrBalanceRatioBlue->GetValue();
         setProperty(node_map_, "BalanceRatioSelector", std::string("Red"));
         Spinnaker::GenApi::CFloatPtr ptrBalanceRatioRed = node_map_->GetNode("BalanceRatio");
-        config.white_balance_blue_ratio = ptrBalanceRatioRed->GetValue();
+        config.white_balance_red_ratio = ptrBalanceRatioRed->GetValue();
       }
     }
 
