@@ -85,11 +85,12 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
     // Set Trigger and Strobe Settings
     // NOTE: The trigger must be disabled (i.e. TriggerMode = "Off") in order to configure whether the source is
     // software or hardware.
-    // setProperty(node_map_, "TriggerMode", std::string("Off"));
-    setProperty(node_map_, "TriggerMode", config.enable_trigger);
+    setProperty(node_map_, "TriggerMode", std::string("Off"));
     setProperty(node_map_, "TriggerSource", config.trigger_source);
+    setProperty(node_map_, "TriggerOverlap", config.trigger_overlap_mode);
     setProperty(node_map_, "TriggerSelector", config.trigger_selector);
     setProperty(node_map_, "TriggerActivation", config.trigger_activation_mode);
+    setProperty(node_map_, "TriggerMode", config.enable_trigger);
 
     if (config.v3_3_selector != "Off")
     {
