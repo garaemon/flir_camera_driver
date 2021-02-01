@@ -4,27 +4,17 @@ install-spinnaker-camera-driver() {
   set -e
   local LSB_RELEASE=$(lsb_release -cs)
   local ARCH=$(dpkg --print-architecture)
-  local SPINNAKER_VERSION="1.26.0.31"
-  local SPINNAKER_HEADER_DIR=/usr/include/spinnaker
+  if [ "$LSB_RELEASE" = "bionic" ]; then
+    local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1gFWVVNmheAncxKw4A8pffkMkFaQYchQe'
+  elif [ "$LSB_RELEASE" = "focal" ]; then
+    local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1fInCHM-cH644ixUIesANfO4idvjaAg7x'
+  fi
+  local SPINNAKER_VERSION="2.3.0.77"
+  local SPINNAKER_HEADER_DIR=/opt/spinnaker/include
   local SPINNAKER_ARCHIVE_DIR="/tmp/spinnaker-${SPINNAKER_VERSION}-${ARCH}.tar.gz"
   local SPINNAKER_INSTALLER_DIR="/tmp/spinnaker-${SPINNAKER_VERSION}-${ARCH}"
   local SPINNAKER_RULE_FILE=/etc/udev/rules.d/40-flir-spinnaker.rules
-  if [ "$SPINNAKER_VERSION" = "1.21.0.61" ]; then
-    if [ "$LSB_RELEASE" = "xenial" ]; then
-      local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1Mdp3izWGmI0qE7L1j3SeSUsRjdZAni16'
-    elif [ "$LSB_RELEASE" = "bionic" ]; then
-      local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1TfxcYkHy20deJ7iCLB9Xojn-WARcxUHE'
-    fi
-  elif [ "$SPINNAKER_VERSION" = "1.26.0.31" ]; then
-    if [ "$LSB_RELEASE" = "xenial" ]; then
-      local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1FLCjz_7JMe1qwmH6GkOk1YpLP-mLzXUg'
-    elif [ "$LSB_RELEASE" = "bionic" ]; then
-      local SPINNAKER_DOWNLOAD_URL='https://drive.google.com/uc?id=1TnhTYvI1JWx_ulehYbb_NVua-Q1uA1me'
-    fi
-  else
-    echo "INVALID SPINNAKER VERSION: ${SPINNAKER_VERSION}"
-    return 1
-  fi
+  local SPINNAKER_PROFILE_FILE=/etc/profile.d/spinnaker.sh
 
   if [ -e $SPINNAKER_HEADER_DIR/Spinnaker.h ]; then
     echo "Spinnaker camera driver is already installed"
@@ -61,9 +51,8 @@ install-spinnaker-camera-driver() {
     echo "Using already unarchived installer"
   fi
 
-  if [ "$(which gdebi)" = "" ]; then
-    apt install -q -qq -y gdebi
-  fi
+  echo "Accepts license"
+  echo libspinnaker libspinnaker/accepted-flir-eula boolean true | debconf-set-selections
 
   echo "Installing"
   cd $SPINNAKER_INSTALLER_DIR
@@ -85,14 +74,28 @@ install-spinnaker-camera-driver() {
   done
 
   echo "Installing udev rules"
-
   if [ ! -e $SPINNAKER_RULE_FILE ]; then
-    mkdir -p /etc/udev/rules.d/
+    mkdir -p $(dirname $SPINNAKER_RULE_FILE)
     echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1e10", MODE:="0666"' > $SPINNAKER_RULE_FILE
 
     systemctl restart udev || true
   else
     echo "udev rule file is already installed"
+  fi
+
+  echo "Installing profile"
+  if [ ! -e $SPINNAKER_PROFILE_FILE ]; then
+    mkdir -p $(dirname $SPINNAKER_PROFILE_FILE)
+    cat <<EOF > ${SPINNAKER_PROFILE_FILE}
+#!/bin/bash
+
+SPINNAKER_ROOT_PATH=/opt/spinnaker
+
+PATH=${SPINNAKER_ROOT_PATH}/bin:${PATH}
+LD_LIBRARY_PATH=${SPINNAKER_ROOT_PATH}/lib:${SPINNAKER_ROOT_PATH}
+EOF
+  else
+    echo "profile is already installed"
   fi
 
   echo "Done"
