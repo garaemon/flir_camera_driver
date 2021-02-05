@@ -84,19 +84,8 @@ install-spinnaker-camera-driver() {
   fi
 
   echo "Installing profile"
-  if [ ! -e $SPINNAKER_PROFILE_FILE ]; then
-    mkdir -p $(dirname $SPINNAKER_PROFILE_FILE)
-    cat <<EOF > ${SPINNAKER_PROFILE_FILE}
-#!/bin/bash
-
-SPINNAKER_ROOT_PATH=/opt/spinnaker
-
-PATH=${SPINNAKER_ROOT_PATH}/bin:${PATH}
-LD_LIBRARY_PATH=${SPINNAKER_ROOT_PATH}/lib:${SPINNAKER_ROOT_PATH}
-EOF
-  else
-    echo "profile is already installed"
-  fi
+  bash ./configure_spinnaker_paths.sh
+  bash ./configure_gentl_paths.sh 64
 
   echo "Done"
 
