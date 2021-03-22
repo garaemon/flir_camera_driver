@@ -69,7 +69,7 @@ SpinnakerCamera::SpinnakerCamera()
 SpinnakerCamera::~SpinnakerCamera()
 {
   camList_.Clear();
-  system_->ReleaseInstance();
+  if (!system_->IsInUse()) system_->ReleaseInstance();
 }
 
 void SpinnakerCamera::setNewConfiguration(spinnaker_camera_driver::SpinnakerConfig& config, const uint32_t& level)
