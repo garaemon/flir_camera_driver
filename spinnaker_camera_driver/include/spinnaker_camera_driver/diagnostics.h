@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <diagnostic_msgs/DiagnosticStatus.h>
 #include <ros/ros.h>
 
+#include <memory>
 #include <utility>
 #include <string>
 #include <vector>

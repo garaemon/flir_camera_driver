@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "spinnaker_camera_driver/diagnostics.h"
 
+#include <memory>
 #include <utility>
 #include <string>
 
