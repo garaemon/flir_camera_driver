@@ -69,7 +69,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <dynamic_reconfigure/server.h>  // Needed for the dynamic_reconfigure gui service to run
 
 #include <fstream>
+#include <memory>
 #include <string>
+#include <utility>
 
 namespace spinnaker_camera_driver
 {
