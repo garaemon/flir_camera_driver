@@ -302,6 +302,9 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
 
     setProperty(node_map_, "ReverseX", config.reverse_x);
     setProperty(node_map_, "ReverseY", config.reverse_y);
+
+    // Set GigE Limit
+    setProperty(node_map_, "GevSCPSPacketSize", config.gev_scps_packet_size);
   }
   catch (const Spinnaker::Exception& e)
   {
