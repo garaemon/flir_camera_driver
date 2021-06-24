@@ -305,7 +305,12 @@ private:
     pnh.param<int>("packet_size", packet_size_, 1400);
     pnh.param<bool>("auto_packet_size", auto_packet_size_, true);
     pnh.param<int>("packet_delay", packet_delay_, 4000);
+    pnh.param<bool>("set_gige_parameter", set_gige_parameter_, false);
 
+    if (set_gige_parameter_)
+    {
+      spinnaker_.setPacketSize(packet_size_);
+    }
     // TODO(mhosmar):  Set GigE parameters:
     // spinnaker_.setGigEParameters(auto_packet_size_, packet_size_, packet_delay_);
 
@@ -756,6 +761,9 @@ private:
   int packet_size_;
   /// GigE packet delay:
   int packet_delay_;
+
+  /// set GigE parameter flag:
+  bool set_gige_parameter_;
 
   /// Configuration:
   spinnaker_camera_driver::SpinnakerConfig config_;

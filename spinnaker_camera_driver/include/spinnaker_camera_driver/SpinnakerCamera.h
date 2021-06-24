@@ -162,6 +162,7 @@ public:
   void setDesiredCamera(const uint32_t& id);
 
   void setGain(const float& gain);
+  void setPacketSize(const int packetsize);
   int getHeightMax();
   int getWidthMax();
   Spinnaker::GenApi::CNodePtr readProperty(const Spinnaker::GenICam::gcstring property_name);

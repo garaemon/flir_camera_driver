@@ -64,6 +64,7 @@ public:
 
   virtual void setROI(const int x_offset, const int y_offset, const int roi_width, const int roi_height);
   virtual void setGain(const float& gain);
+  virtual void setPacketSize(const int packet_size);
   int getHeightMax() const;
   int getWidthMax() const;
 
