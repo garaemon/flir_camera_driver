@@ -124,6 +124,12 @@ void SpinnakerCamera::setGain(const float& gain)
     camera_->setGain(gain);
 }
 
+void SpinnakerCamera::setPacketSize(const int packet_size)
+{
+  if (camera_)
+    camera_->setPacketSize(packet_size);
+}
+
 int SpinnakerCamera::getHeightMax()
 {
   if (camera_)
