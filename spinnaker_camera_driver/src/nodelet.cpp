@@ -521,11 +521,11 @@ private:
             // Set last configuration, forcing the reconfigure level to stop
             spinnaker_.setNewConfiguration(config_, SpinnakerCamera::LEVEL_RECONFIGURE_STOP);
 
-	    // Set GigE parameters
-	    if (set_gige_parameter_)
-	    {
-	      spinnaker_.setPacketSize(packet_size_);
-	    }
+            // Set GigE parameters
+            if (set_gige_parameter_)
+            {
+              spinnaker_.setPacketSize(packet_size_);
+            }
 
             // Set the timeout for grabbing images.
             try
