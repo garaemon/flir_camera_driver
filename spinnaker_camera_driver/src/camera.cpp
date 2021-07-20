@@ -302,6 +302,13 @@ void Camera::setNewConfiguration(SpinnakerConfig& config, const uint32_t& level)
 
     setProperty(node_map_, "ReverseX", config.reverse_x);
     setProperty(node_map_, "ReverseY", config.reverse_y);
+
+    if (config.gige_mode)
+    {
+      setProperty(node_map_, "GevSCPSPacketSize", config.gev_scps_packet_size);
+      setProperty(node_map_, "DeviceLinkThroughputLimit", config.device_link_throughput_limit);
+    }
+    setProperty(node_map_, "DefectCorrectStaticEnable", config.defect_correct_static_enable);
   }
   catch (const Spinnaker::Exception& e)
   {
@@ -382,13 +389,6 @@ void Camera::setROI(const int x_offset, const int y_offset, const int roi_width,
   setProperty(node_map_, "OffsetY", y_offset);
   roi_y_offset_ = y_offset;
 }
-
-void Camera::setPacketSize(const int packet_size)
-{
-  // Set GigE Packet Size
-  setProperty(node_map_, "GevSCPSPacketSize", packet_size);
-}
-
 
 void Camera::setGain(const float& gain)
 {

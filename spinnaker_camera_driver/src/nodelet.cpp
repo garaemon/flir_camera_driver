@@ -304,8 +304,7 @@ private:
     // Get GigE camera parameters:
     pnh.param<int>("packet_size", packet_size_, 1400);
     pnh.param<bool>("auto_packet_size", auto_packet_size_, true);
-    pnh.param<int>("device_link_throughput_limit", device_link_throughput_limit_, 125000000);
-    pnh.param<bool>("set_gige_parameter", set_gige_parameter_, false);
+    pnh.param<int>("packet_delay", packet_delay_, 4000);
 
     // TODO(mhosmar):  Set GigE parameters:
     // spinnaker_.setGigEParameters(auto_packet_size_, packet_size_, packet_delay_);
@@ -520,12 +519,6 @@ private:
 
             // Set last configuration, forcing the reconfigure level to stop
             spinnaker_.setNewConfiguration(config_, SpinnakerCamera::LEVEL_RECONFIGURE_STOP);
-
-            // Set GigE parameters
-            if (set_gige_parameter_)
-            {
-              spinnaker_.setPacketSize(packet_size_);
-            }
 
             // Set the timeout for grabbing images.
             try
@@ -762,12 +755,7 @@ private:
   /// GigE packet size:
   int packet_size_;
   /// GigE packet delay:
-  // int packet_delay_;
-
-  /// GigE Device Link Throughput Limit:
-  int device_link_throughput_limit_;
-  /// set GigE parameter flag:
-  bool set_gige_parameter_;
+  int packet_delay_;
 
   /// Configuration:
   spinnaker_camera_driver::SpinnakerConfig config_;
