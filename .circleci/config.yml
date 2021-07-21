@@ -4,21 +4,7 @@ orbs:
   slack: circleci/slack@3.4.2
   gitai: gitai/gitai_orb@volatile
 
-
 jobs:
-  melodic:
-    docker:
-      - image: gitaiinc/gitai-ci:melodic
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASSWORD
-    steps:
-      - gitai/install_spinnaker
-      - gitai/test:
-          cache_prefix: cache-melodic
-          catkin_install: true
-      - slack/status
-
   noetic:
     docker:
       - image: gitaiinc/gitai-ci:noetic
@@ -29,13 +15,10 @@ jobs:
       - gitai/install_spinnaker
       - gitai/test:
           cache_prefix: cache-noetic
-          catkin_install: true
       - slack/status
 
 workflows:
   tests:
     jobs:
-      - melodic:
-          context: gitai_ci
       - noetic:
           context: gitai_ci
