@@ -362,6 +362,22 @@ void SpinnakerCamera::stop()
   }
 }
 
+void SpinnakerCamera::reset()
+{
+  if (pCam_)
+  {
+    try
+    {
+      captureRunning_ = false;
+      pCam_->DeviceReset();
+    }
+    catch (const Spinnaker::Exception& e)
+    {
+      throw std::runtime_error("[SpinnakerCamera::reset] Failed to reset device with error: " + std::string(e.what()));
+    }
+  }
+}
+
 void SpinnakerCamera::grabImage(sensor_msgs::Image* image, const std::string& frame_id)
 {
   std::lock_guard<std::mutex> scopedLock(mutex_);
