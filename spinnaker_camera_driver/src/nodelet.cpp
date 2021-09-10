@@ -264,6 +264,8 @@ private:
     // Get a serial number through ros
     int serial = 0;
 
+    pnh.param<bool>("reset_on_start", reset_on_start_, false);
+
     XmlRpc::XmlRpcValue serial_xmlrpc;
     pnh.getParam("serial", serial_xmlrpc);
     if (serial_xmlrpc.getType() == XmlRpc::XmlRpcValue::TypeInt)
@@ -446,6 +448,35 @@ private:
 
     State state = DISCONNECTED;
     State previous_state = NONE;
+
+    if (reset_on_start_)
+    {
+      try
+      {
+        NODELET_INFO("Resetting device");
+        spinnaker_.reset();
+        spinnaker_.disconnect();
+        while (!boost::this_thread::interruption_requested())
+        {
+          try
+          {
+            spinnaker_.connect();
+            break;
+          }
+          catch (const std::runtime_error &e)
+          {
+            spinnaker_.disconnect();
+            NODELET_INFO_STREAM("Waiting for device reset...");
+            boost::this_thread::sleep_for(boost::chrono::seconds(1));
+          }
+        }
+        NODELET_INFO("Device is reset");
+      }
+      catch (const std::runtime_error &e)
+      {
+        NODELET_ERROR("%s", e.what());
+      }
+    }
 
     while (!boost::this_thread::interruption_requested())  // Block until we need to stop this thread.
     {
@@ -742,6 +773,7 @@ private:
   std::shared_ptr<boost::thread> pubThread_;  ///< The thread that reads and publishes the images.
   std::shared_ptr<boost::thread> diagThread_;  ///< The thread that reads and publishes the diagnostics.
 
+  bool reset_on_start_;
   bool publish_diagnostics_;
   double diag_pub_rate_;
   std::unique_ptr<DiagnosticsManager> diag_man;

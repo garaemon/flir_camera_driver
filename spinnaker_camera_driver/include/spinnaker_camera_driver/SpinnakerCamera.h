@@ -132,6 +132,13 @@ public:
   void stop();
 
   /*!
+  * \brief Resets the camera loading data into its buffer.
+  *
+  * This function will stop the camera capturing images and loading them into the buffer.
+  */
+  void reset();
+
+  /*!
   * \brief Loads the raw data from the cameras buffer.
   *
   * This function will load the raw data from the buffer and place it into a sensor_msgs::Image.
