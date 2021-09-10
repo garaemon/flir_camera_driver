@@ -636,7 +636,18 @@ private:
           {
             NODELET_WARN("%s", e.what());
           }
-
+          catch (const IncompleteImageException& e)
+          {
+            if (config_.ignore_incomplete_image)
+            {
+              NODELET_WARN("%s", e.what());
+            }
+            else
+            {
+              NODELET_ERROR("%s", e.what());
+              state = ERROR;
+            }
+          }
           catch (std::runtime_error& e)
           {
             NODELET_ERROR("%s", e.what());
