@@ -443,7 +443,8 @@ private:
       STOPPED,
       DISCONNECTED,
       CONNECTED,
-      STARTED
+      STARTED,
+      KILL
     };
 
     State state = DISCONNECTED;
@@ -486,6 +487,11 @@ private:
 
       switch (state)
       {
+        case KILL:
+          {
+            ros::shutdown();
+          }
+          break;
         case ERROR:
 // Generally there's no need to stop before disconnecting after an
 // error. Indeed, stop will usually fail.
@@ -682,7 +688,8 @@ private:
           catch (std::runtime_error& e)
           {
             NODELET_ERROR("%s", e.what());
-            state = ERROR;
+            NODELET_ERROR("Received std::runtime_error, kill the process");
+            state = KILL;
           }
 
           break;
